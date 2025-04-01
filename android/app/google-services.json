@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "367791406144",
+    "firebase_url": "https://open-square-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "open-square",
+    "storage_bucket": "open-square.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:367791406144:android:d56742b64e0b9a5ebf33a5",
+        "android_client_info": {
+          "package_name": "com.example.open_square"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8f5FnxLKPr_PC_H3trUliI8TesIj_wyc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
