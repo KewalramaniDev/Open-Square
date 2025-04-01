@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:open_square/SplashScreen.dart';
 import 'firebase_options.dart';
 import 'register.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -44,7 +45,7 @@ class MyApp extends StatelessWidget {
           onSurface: Colors.black,
         ),
       ),
-      home: const RegisterScreen(),
+      home: SplashScreen(),
     );
   }
 }
