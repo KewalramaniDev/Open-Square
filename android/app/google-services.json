@@ -1,14 +1,52 @@
 {
   "project_info": {
-    "project_number": "367791406144",
-    "firebase_url": "https://open-square-default-rtdb.asia-southeast1.firebasedatabase.app",
-    "project_id": "open-square",
-    "storage_bucket": "open-square.firebasestorage.app"
+    "project_number": "953606872243",
+    "firebase_url": "https://ccclone-1e594-default-rtdb.firebaseio.com",
+    "project_id": "ccclone-1e594",
+    "storage_bucket": "ccclone-1e594.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:367791406144:android:d56742b64e0b9a5ebf33a5",
+        "mobilesdk_app_id": "1:953606872243:android:5e71cb2148cb04537524c6",
+        "android_client_info": {
+          "package_name": "com.closecircle"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKGLeABnxoW8AChICeR52SIrCD_lZgXC8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:953606872243:android:4c63e67f6f9e13957524c6",
+        "android_client_info": {
+          "package_name": "com.example.call"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKGLeABnxoW8AChICeR52SIrCD_lZgXC8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:953606872243:android:6c89475cc0dab17b7524c6",
         "android_client_info": {
           "package_name": "com.example.open_square"
         }
@@ -16,7 +54,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyB8f5FnxLKPr_PC_H3trUliI8TesIj_wyc"
+          "current_key": "AIzaSyAKGLeABnxoW8AChICeR52SIrCD_lZgXC8"
         }
       ],
       "services": {

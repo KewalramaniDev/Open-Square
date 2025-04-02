@@ -22,7 +22,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
-  final TextEditingController _aboutController = TextEditingController(text: "Hey There! I am using Open-Square");
+  final TextEditingController _aboutController =
+  TextEditingController(text: "Hey There! I am using Open-Square");
   final _formKey = GlobalKey<FormState>();
   File? _image;
 
@@ -61,11 +62,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         );
         String uid = userCredential.user!.uid;
 
-        String imageUrl = "https://ui-avatars.com/api/?name=${Uri.encodeComponent(_nameController.text)}";
+        String imageUrl =
+            "https://ui-avatars.com/api/?name=${Uri.encodeComponent(_nameController.text)}";
         if (_image != null) {
           imageUrl = await _uploadImage(uid);
         }
-
 
         String platform = "";
         if (kIsWeb) {
@@ -107,113 +108,130 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
+  Widget _buildTextField(
+      TextEditingController controller,
+      String label,
+      IconData icon, {
+        TextInputType keyboardType = TextInputType.text,
+        bool obscureText = false,
+      }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(fontSize: 14, color: Colors.black87),
+        prefixIcon: Icon(icon, color: Colors.grey, size: 16),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(4),
+          borderSide: const BorderSide(color: Colors.grey, width: 0.8),
+        ),
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+      ),
+      keyboardType: keyboardType,
+      obscureText: obscureText,
+      validator: (value) => value!.isEmpty ? "Please enter your $label" : null,
+      style: const TextStyle(fontSize: 14),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Row(
-          children: [
-            Image.asset("assets/images/logo.png", height: 70),
-          ],
+        title: const Text(
+          "Register",
+          style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: const Color(0xFF004474),
-        elevation: 2,
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Card(
-            elevation: 10,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    GestureDetector(
-                      onTap: _pickImage,
-                      child: CircleAvatar(
-                        radius: 50,
-                        backgroundColor: Colors.teal.shade100,
-                        backgroundImage:
-                        _image != null ? FileImage(_image!) : NetworkImage("https://ui-avatars.com/api/?name=${Uri.encodeComponent(_nameController.text)}") as ImageProvider,
-                        child: _image == null
-                            ? const Icon(Icons.camera_alt, size: 40, color: Colors.teal)
-                            : null,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    _buildTextField(_nameController, "Name", Icons.person),
-                    const SizedBox(height: 15),
-                    _buildTextField(_numberController, "Phone Number", Icons.phone,
-                        keyboardType: TextInputType.phone),
-                    const SizedBox(height: 15),
-                    _buildTextField(_emailController, "Email", Icons.email,
-                        keyboardType: TextInputType.emailAddress),
-                    const SizedBox(height: 15),
-                    _buildTextField(_passwordController, "Password", Icons.lock,
-                        obscureText: true),
-                    const SizedBox(height: 15),
-                    _buildTextField(_confirmPasswordController, "Confirm Password", Icons.lock,
-                        obscureText: true),
-                    const SizedBox(height: 15),
-                    _buildTextField(_aboutController, "About", Icons.info),
-                    const SizedBox(height: 25),
-                    ElevatedButton(
-                      onPressed: _registerUser,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.teal,
-                        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      child: const Text(
-                        "Register",
-                        style: TextStyle(fontSize: 18, color: Colors.white),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => const LoginScreen()),
-                        );
-                      },
-                      child: const Text(
-                        "Already have an account? Login",
-                        style: TextStyle(color: Colors.blue),
-                      ),
-                    ),
-                  ],
+          padding: const EdgeInsets.all(12),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Colors.grey.shade300, width: 0.8),
+              borderRadius: BorderRadius.circular(4),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
                 ),
+              ],
+            ),
+            padding: const EdgeInsets.all(16),
+            margin: const EdgeInsets.symmetric(horizontal: 12),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
+                    onTap: _pickImage,
+                    child: CircleAvatar(
+                      radius: 40,
+                      backgroundColor: Colors.grey.shade200,
+                      backgroundImage: _image != null
+                          ? FileImage(_image!)
+                          : NetworkImage("https://ui-avatars.com/api/?name=${Uri.encodeComponent(_nameController.text)}")
+                      as ImageProvider,
+                      child: _image == null
+                          ? const Icon(Icons.camera_alt, size: 24, color: Colors.grey)
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildTextField(_nameController, "Name", Icons.person),
+                  const SizedBox(height: 12),
+                  _buildTextField(_numberController, "Phone Number", Icons.phone, keyboardType: TextInputType.phone),
+                  const SizedBox(height: 12),
+                  _buildTextField(_emailController, "Email", Icons.email, keyboardType: TextInputType.emailAddress),
+                  const SizedBox(height: 12),
+                  _buildTextField(_passwordController, "Password", Icons.lock, obscureText: true),
+                  const SizedBox(height: 12),
+                  _buildTextField(_confirmPasswordController, "Confirm Password", Icons.lock, obscureText: true),
+                  const SizedBox(height: 12),
+                  _buildTextField(_aboutController, "About", Icons.info),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _registerUser,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF1A73E8),
+                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                    child: const Text(
+                      "Register",
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const LoginScreen()),
+                      );
+                    },
+                    child: const Text(
+                      "Already have an account? Login",
+                      style: TextStyle(fontSize: 14, color: Colors.blue),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildTextField(TextEditingController controller, String label, IconData icon,
-      {TextInputType keyboardType = TextInputType.text, bool obscureText = false}) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, color: Colors.blueGrey),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-      keyboardType: keyboardType,
-      obscureText: obscureText,
-      validator: (value) => value!.isEmpty ? "Please enter your $label" : null,
     );
   }
 }

@@ -43,6 +43,9 @@ dependencies:
   image_picker: ^1.1.2
   platform: ^3.1.6
   intl: ^0.20.2
+  flutter_webrtc: ^0.13.0
+  cloud_firestore: ^5.6.6
+  fluttertoast: ^8.2.12
 
 dev_dependencies:
   flutter_test:

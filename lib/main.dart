@@ -5,11 +5,11 @@ import 'firebase_options.dart';
 import 'register.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-const Color primaryColor = Color(0xFF004474); // Blue
-const Color secondaryColor = Color(0xFF660000); // Dark Red
-const Color accentColor = Color(0xFFf2ca5c);    // Gold-ish
-const Color lightColor = Color(0xFFf8e7bb);     // Light Beige
-const Color backgroundColor = Color(0xFFfbf5de);  // Off White
+const Color primaryColor = Color(0xFF004474);
+const Color secondaryColor = Color(0xFF660000);
+const Color accentColor = Color(0xFFf2ca5c);
+const Color lightColor = Colors.white;
+const Color backgroundColor = Color(0xFFfbf5de);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
