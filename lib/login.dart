@@ -5,6 +5,8 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:open_square/register.dart';
 
+import 'message.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -49,6 +51,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Login Successful!")),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => MessageScreen(currentUserId: uid)),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
