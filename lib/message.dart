@@ -3,6 +3,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:open_square/login.dart';
 import 'chat_screen.dart';
+import 'groupchat.dart';
 
 class MessageScreen extends StatefulWidget {
   final String currentUserId;
@@ -16,13 +17,14 @@ class MessageScreen extends StatefulWidget {
 class _MessageScreenState extends State<MessageScreen> {
   final DatabaseReference _usersRef = FirebaseDatabase.instance.ref("Users");
   final DatabaseReference _lastChatRef = FirebaseDatabase.instance.ref("LastChat");
+  final DatabaseReference _groupChatRef = FirebaseDatabase.instance.ref("GroupChat");
 
   Map<String, dynamic>? currentUserData;
   Map<String, dynamic>? _selectedChat;
-
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = "";
   String _selectedFilter = "Recent";
+  List<String> _selectedUserIds = [];
 
   @override
   void initState() {
@@ -51,6 +53,202 @@ class _MessageScreenState extends State<MessageScreen> {
       MaterialPageRoute(
         builder: (context) => LoginScreen(),
       ),
+    );
+  }
+
+  void _showCreateGroupDialog() {
+    String groupName = "";
+    String groupDescription = "";
+    _selectedUserIds = [];
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(builder: (context, setStateDialog) {
+          return Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            child: Container(
+              color: Colors.white,
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    "Create Group",
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    style: const TextStyle(fontSize: 12, color: Colors.black),
+                    decoration: InputDecoration(
+                      hintText: "Group Name",
+                      hintStyle: const TextStyle(fontSize: 12, color: Colors.grey),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: Colors.grey, width: 0.5),
+                      ),
+                    ),
+                    onChanged: (value) => groupName = value.trim(),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    style: const TextStyle(fontSize: 12, color: Colors.black),
+                    decoration: InputDecoration(
+                      hintText: "Group Description",
+                      hintStyle: const TextStyle(fontSize: 12, color: Colors.grey),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: Colors.grey, width: 0.5),
+                      ),
+                    ),
+                    onChanged: (value) => groupDescription = value.trim(),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    "Select Members",
+                    style: TextStyle(fontSize: 12, color: Colors.black),
+                  ),
+                  const SizedBox(height: 4),
+                  Container(
+                    height: 150,
+                    child: StreamBuilder(
+                      stream: _usersRef.onValue,
+                      builder: (context, AsyncSnapshot<DatabaseEvent> userSnapshot) {
+                        if (!userSnapshot.hasData || userSnapshot.data!.snapshot.value == null) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        Map<String, dynamic> users = Map<String, dynamic>.from(
+                          userSnapshot.data!.snapshot.value as Map,
+                        );
+                        List<String> userIds = users.keys.where((id) => id != widget.currentUserId).toList();
+                        return ListView.builder(
+                          itemCount: userIds.length,
+                          itemBuilder: (context, index) {
+                            String userId = userIds[index];
+                            Map<String, dynamic> user = Map<String, dynamic>.from(users[userId]);
+                            bool isSelected = _selectedUserIds.contains(userId);
+                            return CheckboxListTile(
+                              value: isSelected,
+                              title: Text(
+                                user['name'] ?? "Unknown",
+                                style: const TextStyle(fontSize: 12, color: Colors.black),
+                              ),
+                              secondary: CircleAvatar(
+                                radius: 16,
+                                backgroundImage: NetworkImage(
+                                  user['image'] ?? "https://ui-avatars.com/api/?name=${user['name'] ?? 'User'}",
+                                ),
+                              ),
+                              onChanged: (val) {
+                                setStateDialog(() {
+                                  if (val == true) {
+                                    _selectedUserIds.add(userId);
+                                  } else {
+                                    _selectedUserIds.remove(userId);
+                                  }
+                                });
+                              },
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("Cancel", style: TextStyle(fontSize: 12, color: Colors.blue)),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (groupName.isNotEmpty && _selectedUserIds.isNotEmpty) {
+                            List<Map<String, dynamic>> members = [];
+                            members.add({
+                              "id": widget.currentUserId,
+                              "name": currentUserData?['name'] ?? "User",
+                              "image": currentUserData?['image'] ?? "",
+                              "about": currentUserData?['about'] ?? "",
+                              "admin": "true",
+                              "deviceToken": currentUserData?['fcmToken'] ?? "",
+                              "phoneno": currentUserData?['number'] ?? "",
+                              "deleteMessage": "",
+                              "messageStatus": "read",
+                              "unReadMessageCount": "0",
+                            });
+                            final snapshot = await _usersRef.get();
+                            if (snapshot.exists) {
+                              Map<String, dynamic> allUsers = Map<String, dynamic>.from(snapshot.value as Map);
+                              for (String id in _selectedUserIds) {
+                                if (allUsers.containsKey(id)) {
+                                  Map<String, dynamic> user = Map<String, dynamic>.from(allUsers[id]);
+                                  members.add({
+                                    "id": id,
+                                    "name": user['name'] ?? "User",
+                                    "image": user['image'] ?? "",
+                                    "about": user['about'] ?? "",
+                                    "admin": "false",
+                                    "deviceToken": user['fcmToken'] ?? "",
+                                    "phoneno": user['number'] ?? "",
+                                    "deleteMessage": "",
+                                    "messageStatus": "Unread",
+                                    "unReadMessageCount": "0",
+                                  });
+                                }
+                              }
+                            }
+                            String now = DateTime.now().toString();
+                            DatabaseReference newGroupRef = _groupChatRef.push();
+                            Map<String, dynamic> groupData = {
+                              "_id": newGroupRef.key,
+                              "addmemberacccess": "true",
+                              "adminId": widget.currentUserId,
+                              "adminName": currentUserData?['name'] ?? "User",
+                              "createdAt": now,
+                              "editAccess": "true",
+                              "groupIcon": "",
+                              "groupName": groupName,
+                              "groupdescription": groupDescription,
+                              "lastmessage": "",
+                              "lastmessagedate": "",
+                              "lastmessagesenderdid": "",
+                              "lastmessagesendername": "",
+                              "lastmessagetime": "",
+                              "lastmessagetype": "",
+                              "mediatype": "",
+                              "mediaurl": "",
+                              "members": members,
+                              "readMessageUserId": widget.currentUserId,
+                              "sendmessageacccess": "true"
+                            };
+                            await newGroupRef.set(groupData);
+                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => GroupChatScreen(
+                                  groupId: newGroupRef.key!,
+                                  currentUserId: widget.currentUserId,
+                                  groupName: groupName,
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                        child: const Text("Create", style: TextStyle(fontSize: 12)),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+      },
     );
   }
 
@@ -83,6 +281,13 @@ class _MessageScreenState extends State<MessageScreen> {
             tooltip: "New Chat",
             iconSize: 20,
             onPressed: _showUserListDialog,
+          ),
+          IconButton(
+            icon: const Icon(Icons.group_add),
+            color: Colors.black,
+            tooltip: "New Group",
+            iconSize: 20,
+            onPressed: _showCreateGroupDialog,
           ),
           IconButton(
             icon: const Icon(Icons.logout_outlined),
@@ -125,11 +330,11 @@ class _MessageScreenState extends State<MessageScreen> {
         children: [
           TextField(
             controller: _searchController,
-            style: const TextStyle(fontSize: 12),
+            style: const TextStyle(fontSize: 12, color: Colors.black),
             decoration: InputDecoration(
               hintText: "Search chats...",
-              hintStyle: const TextStyle(fontSize: 12),
-              prefixIcon: const Icon(Icons.search, size: 16),
+              hintStyle: const TextStyle(fontSize: 12, color: Colors.grey),
+              prefixIcon: const Icon(Icons.search, size: 16, color: Colors.black),
               contentPadding: const EdgeInsets.symmetric(vertical: 6),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -177,11 +382,9 @@ class _MessageScreenState extends State<MessageScreen> {
         if (!snapshot.hasData || snapshot.data!.snapshot.value == null) {
           return const Center(child: CircularProgressIndicator());
         }
-
         Map<String, dynamic> lastChats =
         Map<String, dynamic>.from(snapshot.data!.snapshot.value as Map);
         Map<String, Map<String, dynamic>> uniqueChats = {};
-
         for (var entry in lastChats.entries) {
           List<String> ids = entry.key.split("_");
           if (ids.contains(widget.currentUserId)) {
@@ -191,15 +394,12 @@ class _MessageScreenState extends State<MessageScreen> {
             }
           }
         }
-
         List<Map<String, dynamic>> chatList = uniqueChats.values.toList();
-
         if (_selectedFilter == "Unread") {
           chatList = chatList.where((chat) => chat['messageStatus'] == "Unread").toList();
         } else if (_selectedFilter == "Recent") {
           chatList.sort((a, b) => b['timestamp'].compareTo(a['timestamp']));
         }
-
         if (_searchQuery.isNotEmpty) {
           chatList = chatList.where((chat) {
             bool isMe = chat['sentID'] == widget.currentUserId;
@@ -207,7 +407,6 @@ class _MessageScreenState extends State<MessageScreen> {
             return chatUserName.toLowerCase().contains(_searchQuery);
           }).toList();
         }
-
         if (chatList.isEmpty) {
           return const Center(
             child: Text(
@@ -216,7 +415,6 @@ class _MessageScreenState extends State<MessageScreen> {
             ),
           );
         }
-
         return ListView.builder(
           itemCount: chatList.length,
           itemBuilder: (context, index) {
@@ -231,7 +429,6 @@ class _MessageScreenState extends State<MessageScreen> {
             String chatUserAbout = isMe ? (chat['receiverabout'] ?? "") : (chat['sentabout'] ?? "");
             String chatUserPhone = isMe ? (chat['receiverphone'] ?? "") : (chat['sentphone'] ?? "");
             bool isUnread = chat['messageStatus'] == "Unread";
-
             return InkWell(
               onTap: () {
                 if (isLargeScreen) {
@@ -368,11 +565,11 @@ class _MessageScreenState extends State<MessageScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                   child: TextField(
-                    style: const TextStyle(fontSize: 12),
+                    style: const TextStyle(fontSize: 12, color: Colors.black),
                     decoration: InputDecoration(
                       hintText: "Search users...",
-                      hintStyle: const TextStyle(fontSize: 12),
-                      prefixIcon: const Icon(Icons.search, size: 16),
+                      hintStyle: const TextStyle(fontSize: 12, color: Colors.grey),
+                      prefixIcon: const Icon(Icons.search, size: 16, color: Colors.black),
                       contentPadding: const EdgeInsets.symmetric(vertical: 4),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),

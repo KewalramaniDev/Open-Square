@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:open_square/register.dart';
+import 'BottomNavBar.dart';
 import 'message.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -51,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => MessageScreen(currentUserId: uid)),
+          MaterialPageRoute(builder: (context) => BottomNavBar(currentUserId: uid)),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(

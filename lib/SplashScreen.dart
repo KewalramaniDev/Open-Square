@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:open_square/BottomNavBar.dart';
 import 'package:open_square/register.dart';
 import 'message.dart';
 
@@ -25,7 +26,7 @@ class _SplashScreenState extends State<SplashScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => MessageScreen(currentUserId: uid),
+          builder: (context) => BottomNavBar(currentUserId: uid),
         ),
       );
     } else {

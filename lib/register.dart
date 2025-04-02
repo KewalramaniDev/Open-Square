@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:open_square/message.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter/foundation.dart';
+import 'BottomNavBar.dart';
 import 'login.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -98,7 +99,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         );
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => MessageScreen(currentUserId: uid)),
+          MaterialPageRoute(builder: (context) => BottomNavBar(currentUserId: uid)),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
