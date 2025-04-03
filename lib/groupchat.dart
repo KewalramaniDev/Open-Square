@@ -43,10 +43,18 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     _messageController.dispose();
     super.dispose();
   }
-  void _sendMessage() {
+  void _sendMessage() async {
     String message = _messageController.text.trim();
     if (message.isEmpty) return;
     String now = DateFormat("dd-MM-yyyy HH:mm:ss").format(DateTime.now());
+    DatabaseEvent event = await FirebaseDatabase.instance.ref("GroupChat").child(widget.groupId).once();
+    List<dynamic> members = [];
+    if (event.snapshot.value != null) {
+      Map groupData = event.snapshot.value as Map;
+      if (groupData.containsKey("members")) {
+        members = groupData["members"];
+      }
+    }
     Map<String, dynamic> messageData = {
       "attachmentUploadFrom": "",
       "date": now.split(" ").first,
@@ -55,7 +63,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       "indexId": "",
       "mediaType": "M",
       "mediaURL": "",
-      "members": [],
+      "members": members,
       "messageStatus": "Unread",
       "readMessageUserId": widget.currentUserId,
       "replayMessage": "",
@@ -77,8 +85,17 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     newMsgRef.set(messageData);
     _messageController.clear();
   }
-  void _scheduleMessage(String text, DateTime scheduledTime) {
+
+  Future<void> _scheduleMessage(String text, DateTime scheduledTime) async {
     String scheduledStr = DateFormat("dd-MM-yyyy HH:mm:ss").format(scheduledTime);
+    DatabaseEvent event = await FirebaseDatabase.instance.ref("GroupChat").child(widget.groupId).once();
+    List<dynamic> members = [];
+    if (event.snapshot.value != null) {
+      Map groupData = event.snapshot.value as Map;
+      if (groupData.containsKey("members")) {
+        members = groupData["members"];
+      }
+    }
     Map<String, dynamic> messageData = {
       "attachmentUploadFrom": "",
       "date": scheduledStr.split(" ").first,
@@ -87,7 +104,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       "indexId": "",
       "mediaType": "M",
       "mediaURL": "",
-      "members": [],
+      "members": members,
       "messageStatus": "Unread",
       "readMessageUserId": widget.currentUserId,
       "replayMessage": "",
