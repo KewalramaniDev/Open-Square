@@ -50,7 +50,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
             child: Icon(
               _navItems[index]['icon'],
               size: 18,
-              color: isSelected ? Colors.blue : Colors.grey,
+              color: isSelected ? Color(0xFF075E54) : Colors.grey,
             ),
           ),
         ),
@@ -91,7 +91,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         child: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           backgroundColor: Colors.white,
-          selectedItemColor: Colors.blue,
+          selectedItemColor: Color(0xFF075E54),
           unselectedItemColor: Colors.grey,
           iconSize: 22,
           selectedLabelStyle: const TextStyle(fontSize: 10),
