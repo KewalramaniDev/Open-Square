@@ -3,6 +3,9 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:intl/intl.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import 'GroupDetailsScreen.dart';
+import 'chat_screen.dart';
+
 class GroupChatScreen extends StatefulWidget {
   final String groupId;
   final String currentUserId;
@@ -19,13 +22,11 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   Map<String, String> _reactions = {};
   Map<String, dynamic>? _currentUserData;
-
   @override
   void initState() {
     super.initState();
     _loadCurrentUser();
   }
-
   Future<void> _loadCurrentUser() async {
     DatabaseEvent event = await _usersRef.child(widget.currentUserId).once();
     if (event.snapshot.value != null) {
@@ -34,13 +35,11 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       });
     }
   }
-
   @override
   void dispose() {
     _messageController.dispose();
     super.dispose();
   }
-
   void _sendMessage() async {
     String message = _messageController.text.trim();
     if (message.isEmpty) return;
@@ -49,9 +48,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     List<dynamic> members = [];
     if (event.snapshot.value != null) {
       Map groupData = event.snapshot.value as Map;
-      if (groupData.containsKey("members")) {
-        members = groupData["members"];
-      }
+      if (groupData.containsKey("members")) members = groupData["members"];
     }
     Map<String, dynamic> messageData = {
       "attachmentUploadFrom": "",
@@ -83,16 +80,13 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     newMsgRef.set(messageData);
     _messageController.clear();
   }
-
   Future<void> _scheduleMessage(String text, DateTime scheduledTime) async {
     String scheduledStr = DateFormat("dd-MM-yyyy HH:mm:ss").format(scheduledTime);
     DatabaseEvent event = await FirebaseDatabase.instance.ref("GroupChat").child(widget.groupId).once();
     List<dynamic> members = [];
     if (event.snapshot.value != null) {
       Map groupData = event.snapshot.value as Map;
-      if (groupData.containsKey("members")) {
-        members = groupData["members"];
-      }
+      if (groupData.containsKey("members")) members = groupData["members"];
     }
     Map<String, dynamic> messageData = {
       "attachmentUploadFrom": "",
@@ -126,7 +120,6 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     newMsgRef.set(messageData);
     Fluttertoast.showToast(msg: "Message scheduled for $scheduledStr");
   }
-
   Future<void> _showScheduleMessageDialog() async {
     TextEditingController scheduleController = TextEditingController(text: _messageController.text.trim());
     DateTime? selectedDateTime;
@@ -227,7 +220,6 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       },
     );
   }
-
   DateTime _parseDate(String timestamp) {
     try {
       return DateFormat("dd-MM-yyyy HH:mm:ss").parse(timestamp);
@@ -235,7 +227,6 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       return DateTime.now();
     }
   }
-
   String _getDateLabel(DateTime date) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -244,7 +235,6 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     if (diff == 1) return "Yesterday";
     return DateFormat('d MMM yyyy').format(date);
   }
-
   void _showReactionPicker(String indexId) {
     showModalBottomSheet(
       context: context,
@@ -265,7 +255,6 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       },
     );
   }
-
   Widget _buildReactionIcon(String indexId, String emoji) {
     return InkWell(
       onTap: () {
@@ -275,18 +264,15 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       child: Text(emoji, style: TextStyle(fontSize: 24)),
     );
   }
-
   Future<void> _deleteMessage(String messageKey) async {
     await _groupChatDetailsRef.child(widget.groupId).child(messageKey).update({"deleted": "Yes"});
   }
-
   Widget _buildMessageStatusIcon(String status) {
     if (status == "Unread") return Icon(Icons.check, size: 12, color: Colors.grey);
     if (status == "Delivered") return Icon(Icons.done_all, size: 12, color: Colors.grey);
     if (status == "Read") return Icon(Icons.done_all, size: 12, color: Colors.blue);
     return SizedBox();
   }
-
   Future<void> _showEditMessageDialog(String messageKey, String currentText) async {
     TextEditingController editController = TextEditingController(text: currentText);
     await showDialog(
@@ -323,60 +309,16 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       },
     );
   }
-
-  Future<void> _showGroupDetails() async {
-    DatabaseEvent event = await FirebaseDatabase.instance.ref("GroupChat").child(widget.groupId).once();
-    if (event.snapshot.value != null) {
-      Map groupData = event.snapshot.value as Map;
-      String adminName = groupData["adminName"] ?? "Unknown";
-      String addMemberAccess = groupData["addmemberacccess"] ?? "false";
-      String editAccess = groupData["editAccess"] ?? "false";
-      String sendMessageAccess = groupData["sendmessageacccess"] ?? "false";
-      List<dynamic> members = groupData["members"] ?? [];
-      String memberNames = members.map((m) => m["name"]).take(3).join(", ");
-      if(members.length > 3) memberNames += ", ...";
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text("Group Details", style: TextStyle(color: Color(0xFF075E54))),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Admin: $adminName", style: TextStyle(fontSize: 14)),
-                SizedBox(height: 6),
-                Text("Members: $memberNames", style: TextStyle(fontSize: 14)),
-                SizedBox(height: 6),
-                Text("Add Member Access: $addMemberAccess", style: TextStyle(fontSize: 14)),
-                SizedBox(height: 6),
-                Text("Edit Access: $editAccess", style: TextStyle(fontSize: 14)),
-                SizedBox(height: 6),
-                Text("Send Message Access: $sendMessageAccess", style: TextStyle(fontSize: 14))
-              ],
-            ),
-            actions: [
-              TextButton(
-                  onPressed: () { Navigator.pop(context); },
-                  child: Text("Close", style: TextStyle(color: Colors.pink))
-              )
-            ],
-          );
-        },
-      );
-    }
+  void _openGroupDetails() {
+    Navigator.push(context, PageRouteBuilder(transitionDuration: Duration(milliseconds: 300), pageBuilder: (_, __, ___) => GroupDetailsScreen(groupId: widget.groupId, currentUserId: widget.currentUserId, currentUserData: _currentUserData, groupName: widget.groupName, groupLogo: widget.groupLogo)));
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: IconButton(icon: Icon(Icons.arrow_back_ios, color: Colors.black, size: 20), onPressed: () => Navigator.pop(context)),
         title: InkWell(
-          onTap: _showGroupDetails,
+          onTap: _openGroupDetails,
           child: StreamBuilder(
             stream: FirebaseDatabase.instance.ref("GroupChat").child(widget.groupId).onValue,
             builder: (context, AsyncSnapshot<DatabaseEvent> snapshot) {
@@ -399,11 +341,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                       ),
                       SizedBox(width: 8),
                       Expanded(
-                        child: Text(
-                          widget.groupName,
-                          style: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.w500),
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                        child: Text(widget.groupName, style: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.w500), overflow: TextOverflow.ellipsis),
                       )
                     ],
                   ),
@@ -418,14 +356,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         elevation: 1,
         iconTheme: IconThemeData(color: Colors.black),
         actions: [
-          IconButton(
-            icon: Icon(Icons.call, color: Color(0xFF075E54), size: 18),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: Icon(Icons.videocam, color: Color(0xFF075E54), size: 18),
-            onPressed: () {},
-          )
+          IconButton(icon: Icon(Icons.call, color: Color(0xFF075E54), size: 18), onPressed: () {}),
+          IconButton(icon: Icon(Icons.videocam, color: Color(0xFF075E54), size: 18), onPressed: () {})
         ],
       ),
       backgroundColor: Colors.grey.shade100,
@@ -435,9 +367,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
             child: StreamBuilder(
               stream: _groupChatDetailsRef.child(widget.groupId).onValue,
               builder: (context, AsyncSnapshot<DatabaseEvent> snapshot) {
-                if (!snapshot.hasData || snapshot.data!.snapshot.value == null) {
-                  return Center(child: Text("No messages yet", style: TextStyle(fontSize: 14)));
-                }
+                if (!snapshot.hasData || snapshot.data!.snapshot.value == null) return Center(child: Text("No messages yet", style: TextStyle(fontSize: 14)));
                 Map<dynamic, dynamic> rawMessages = snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
                 List<Map<String, dynamic>> allMessages = [];
                 final seen = <String>{};
@@ -449,7 +379,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                 allMessages = allMessages.where((msg) {
                   if (msg["isScheduled"] == "true") {
                     DateTime scheduledTime = _parseDate(msg["scheduledTime"]);
-                    if (msg["senderId"] != widget.currentUserId && DateTime.now().isBefore(scheduledTime)) { return false; }
+                    if (msg["senderId"] != widget.currentUserId && DateTime.now().isBefore(scheduledTime)) return false;
                   }
                   return true;
                 }).toList();
@@ -584,18 +514,9 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             child: Row(
               children: [
-                IconButton(
-                  icon: Icon(Icons.emoji_emotions_outlined, color: Colors.grey, size: 20),
-                  onPressed: () {},
-                ),
-                IconButton(
-                  icon: Icon(Icons.attach_file, color: Color(0xFF075E54), size: 20),
-                  onPressed: () {},
-                ),
-                IconButton(
-                  icon: Icon(Icons.schedule, color: Colors.pink, size: 20),
-                  onPressed: _showScheduleMessageDialog,
-                ),
+                IconButton(icon: Icon(Icons.emoji_emotions_outlined, color: Colors.grey, size: 20), onPressed: () {}),
+                IconButton(icon: Icon(Icons.attach_file, color: Color(0xFF075E54), size: 20), onPressed: () {}),
+                IconButton(icon: Icon(Icons.schedule, color: Colors.pink, size: 20), onPressed: _showScheduleMessageDialog),
                 Expanded(
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 12),
@@ -605,11 +526,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                       minLines: 1,
                       maxLines: 5,
                       style: TextStyle(fontSize: 14),
-                      decoration: InputDecoration(
-                        hintText: "Type a message...",
-                        hintStyle: TextStyle(fontSize: 14),
-                        border: InputBorder.none,
-                      ),
+                      decoration: InputDecoration(hintText: "Type a message...", hintStyle: TextStyle(fontSize: 14), border: InputBorder.none),
                     ),
                   ),
                 ),
@@ -630,3 +547,5 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     );
   }
 }
+
+
