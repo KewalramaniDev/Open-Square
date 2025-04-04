@@ -41,54 +41,54 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyA7px-T9Gclh1gSrsNOhjz7dVw1_QzsyoI',
-    appId: '1:367791406144:web:965732fad1dfed09bf33a5',
-    messagingSenderId: '367791406144',
-    projectId: 'open-square',
-    authDomain: 'open-square.firebaseapp.com',
-    databaseURL: 'https://open-square-default-rtdb.asia-southeast1.firebasedatabase.app',
-    storageBucket: 'open-square.firebasestorage.app',
-    measurementId: 'G-D4PHV5VW1S',
+    apiKey: 'AIzaSyB64QDqucsuqsqV8zz7GyyO1SGruwSNEBE',
+    appId: '1:953606872243:web:370cfa9882ed512d7524c6',
+    messagingSenderId: '953606872243',
+    projectId: 'ccclone-1e594',
+    authDomain: 'ccclone-1e594.firebaseapp.com',
+    databaseURL: 'https://ccclone-1e594-default-rtdb.firebaseio.com',
+    storageBucket: 'ccclone-1e594.firebasestorage.app',
+    measurementId: 'G-GQETT19ZP0',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyB8f5FnxLKPr_PC_H3trUliI8TesIj_wyc',
-    appId: '1:367791406144:android:d56742b64e0b9a5ebf33a5',
-    messagingSenderId: '367791406144',
-    projectId: 'open-square',
-    databaseURL: 'https://open-square-default-rtdb.asia-southeast1.firebasedatabase.app',
-    storageBucket: 'open-square.firebasestorage.app',
+    apiKey: 'AIzaSyAKGLeABnxoW8AChICeR52SIrCD_lZgXC8',
+    appId: '1:953606872243:android:6c89475cc0dab17b7524c6',
+    messagingSenderId: '953606872243',
+    projectId: 'ccclone-1e594',
+    databaseURL: 'https://ccclone-1e594-default-rtdb.firebaseio.com',
+    storageBucket: 'ccclone-1e594.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyD7nhECMJkS5ZGm5SfjJD8iGwTGx3tAJd0',
-    appId: '1:367791406144:ios:2c7493b3ad4b7472bf33a5',
-    messagingSenderId: '367791406144',
-    projectId: 'open-square',
-    databaseURL: 'https://open-square-default-rtdb.asia-southeast1.firebasedatabase.app',
-    storageBucket: 'open-square.firebasestorage.app',
+    apiKey: 'AIzaSyB9o6jUCP6AkAPshfbDw0jfG_BJiLostCg',
+    appId: '1:953606872243:ios:002a17b1976adcd47524c6',
+    messagingSenderId: '953606872243',
+    projectId: 'ccclone-1e594',
+    databaseURL: 'https://ccclone-1e594-default-rtdb.firebaseio.com',
+    storageBucket: 'ccclone-1e594.firebasestorage.app',
     iosBundleId: 'com.example.openSquare',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyD7nhECMJkS5ZGm5SfjJD8iGwTGx3tAJd0',
-    appId: '1:367791406144:ios:2c7493b3ad4b7472bf33a5',
-    messagingSenderId: '367791406144',
-    projectId: 'open-square',
-    databaseURL: 'https://open-square-default-rtdb.asia-southeast1.firebasedatabase.app',
-    storageBucket: 'open-square.firebasestorage.app',
+    apiKey: 'AIzaSyB9o6jUCP6AkAPshfbDw0jfG_BJiLostCg',
+    appId: '1:953606872243:ios:002a17b1976adcd47524c6',
+    messagingSenderId: '953606872243',
+    projectId: 'ccclone-1e594',
+    databaseURL: 'https://ccclone-1e594-default-rtdb.firebaseio.com',
+    storageBucket: 'ccclone-1e594.firebasestorage.app',
     iosBundleId: 'com.example.openSquare',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyA7px-T9Gclh1gSrsNOhjz7dVw1_QzsyoI',
-    appId: '1:367791406144:web:3df2a98c18b71d41bf33a5',
-    messagingSenderId: '367791406144',
-    projectId: 'open-square',
-    authDomain: 'open-square.firebaseapp.com',
-    databaseURL: 'https://open-square-default-rtdb.asia-southeast1.firebasedatabase.app',
-    storageBucket: 'open-square.firebasestorage.app',
-    measurementId: 'G-PTK4CKR6V5',
+    apiKey: 'AIzaSyB64QDqucsuqsqV8zz7GyyO1SGruwSNEBE',
+    appId: '1:953606872243:web:f300697d507fd9997524c6',
+    messagingSenderId: '953606872243',
+    projectId: 'ccclone-1e594',
+    authDomain: 'ccclone-1e594.firebaseapp.com',
+    databaseURL: 'https://ccclone-1e594-default-rtdb.firebaseio.com',
+    storageBucket: 'ccclone-1e594.firebasestorage.app',
+    measurementId: 'G-5CNXNMYM4N',
   );
 
 }
