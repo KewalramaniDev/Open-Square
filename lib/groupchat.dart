@@ -8,13 +8,7 @@ class GroupChatScreen extends StatefulWidget {
   final String currentUserId;
   final String groupName;
   final String? groupLogo;
-  const GroupChatScreen({
-    Key? key,
-    required this.groupId,
-    required this.currentUserId,
-    required this.groupName,
-    this.groupLogo,
-  }) : super(key: key);
+  const GroupChatScreen({Key? key, required this.groupId, required this.currentUserId, required this.groupName, this.groupLogo}) : super(key: key);
   @override
   State<GroupChatScreen> createState() => _GroupChatScreenState();
 }
@@ -25,11 +19,13 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   Map<String, String> _reactions = {};
   Map<String, dynamic>? _currentUserData;
+
   @override
   void initState() {
     super.initState();
     _loadCurrentUser();
   }
+
   Future<void> _loadCurrentUser() async {
     DatabaseEvent event = await _usersRef.child(widget.currentUserId).once();
     if (event.snapshot.value != null) {
@@ -38,11 +34,13 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       });
     }
   }
+
   @override
   void dispose() {
     _messageController.dispose();
     super.dispose();
   }
+
   void _sendMessage() async {
     String message = _messageController.text.trim();
     if (message.isEmpty) return;
@@ -128,6 +126,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     newMsgRef.set(messageData);
     Fluttertoast.showToast(msg: "Message scheduled for $scheduledStr");
   }
+
   Future<void> _showScheduleMessageDialog() async {
     TextEditingController scheduleController = TextEditingController(text: _messageController.text.trim());
     DateTime? selectedDateTime;
@@ -228,6 +227,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       },
     );
   }
+
   DateTime _parseDate(String timestamp) {
     try {
       return DateFormat("dd-MM-yyyy HH:mm:ss").parse(timestamp);
@@ -235,6 +235,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       return DateTime.now();
     }
   }
+
   String _getDateLabel(DateTime date) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -243,6 +244,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     if (diff == 1) return "Yesterday";
     return DateFormat('d MMM yyyy').format(date);
   }
+
   void _showReactionPicker(String indexId) {
     showModalBottomSheet(
       context: context,
@@ -263,6 +265,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       },
     );
   }
+
   Widget _buildReactionIcon(String indexId, String emoji) {
     return InkWell(
       onTap: () {
@@ -272,15 +275,18 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       child: Text(emoji, style: TextStyle(fontSize: 24)),
     );
   }
+
   Future<void> _deleteMessage(String messageKey) async {
     await _groupChatDetailsRef.child(widget.groupId).child(messageKey).update({"deleted": "Yes"});
   }
+
   Widget _buildMessageStatusIcon(String status) {
     if (status == "Unread") return Icon(Icons.check, size: 12, color: Colors.grey);
     if (status == "Delivered") return Icon(Icons.done_all, size: 12, color: Colors.grey);
     if (status == "Read") return Icon(Icons.done_all, size: 12, color: Colors.blue);
     return SizedBox();
   }
+
   Future<void> _showEditMessageDialog(String messageKey, String currentText) async {
     TextEditingController editController = TextEditingController(text: currentText);
     await showDialog(
@@ -307,7 +313,6 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF075E54)),
               onPressed: () {
-                _usersRef.child(widget.groupId);
                 FirebaseDatabase.instance.ref("GroupChatDetails").child(widget.groupId).child(messageKey).update({"text": editController.text.trim()});
                 Navigator.pop(context);
               },
@@ -318,6 +323,50 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       },
     );
   }
+
+  Future<void> _showGroupDetails() async {
+    DatabaseEvent event = await FirebaseDatabase.instance.ref("GroupChat").child(widget.groupId).once();
+    if (event.snapshot.value != null) {
+      Map groupData = event.snapshot.value as Map;
+      String adminName = groupData["adminName"] ?? "Unknown";
+      String addMemberAccess = groupData["addmemberacccess"] ?? "false";
+      String editAccess = groupData["editAccess"] ?? "false";
+      String sendMessageAccess = groupData["sendmessageacccess"] ?? "false";
+      List<dynamic> members = groupData["members"] ?? [];
+      String memberNames = members.map((m) => m["name"]).take(3).join(", ");
+      if(members.length > 3) memberNames += ", ...";
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Group Details", style: TextStyle(color: Color(0xFF075E54))),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Admin: $adminName", style: TextStyle(fontSize: 14)),
+                SizedBox(height: 6),
+                Text("Members: $memberNames", style: TextStyle(fontSize: 14)),
+                SizedBox(height: 6),
+                Text("Add Member Access: $addMemberAccess", style: TextStyle(fontSize: 14)),
+                SizedBox(height: 6),
+                Text("Edit Access: $editAccess", style: TextStyle(fontSize: 14)),
+                SizedBox(height: 6),
+                Text("Send Message Access: $sendMessageAccess", style: TextStyle(fontSize: 14))
+              ],
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () { Navigator.pop(context); },
+                  child: Text("Close", style: TextStyle(color: Colors.pink))
+              )
+            ],
+          );
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -326,21 +375,44 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
           icon: Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Row(
-          children: [
-            CircleAvatar(
-              radius: 16,
-              backgroundImage: NetworkImage(widget.groupLogo ?? "https://ui-avatars.com/api/?name=${Uri.encodeComponent(widget.groupName)}"),
-            ),
-            SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                widget.groupName,
-                style: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.w500),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
+        title: InkWell(
+          onTap: _showGroupDetails,
+          child: StreamBuilder(
+            stream: FirebaseDatabase.instance.ref("GroupChat").child(widget.groupId).onValue,
+            builder: (context, AsyncSnapshot<DatabaseEvent> snapshot) {
+              String memberNames = "";
+              if (snapshot.hasData && snapshot.data!.snapshot.value != null) {
+                Map groupData = snapshot.data!.snapshot.value as Map;
+                List<dynamic> members = groupData["members"] ?? [];
+                memberNames = members.map((m) => m["name"]).take(3).join(", ");
+                if(members.length > 3) memberNames += ", ...";
+              }
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 16,
+                        backgroundImage: NetworkImage(widget.groupLogo ?? "https://ui-avatars.com/api/?name=${Uri.encodeComponent(widget.groupName)}"),
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          widget.groupName,
+                          style: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.w500),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(height: 2),
+                  Text(memberNames, style: TextStyle(fontSize: 12, color: Colors.black54), overflow: TextOverflow.ellipsis)
+                ],
+              );
+            },
+          ),
         ),
         backgroundColor: Colors.white,
         elevation: 1,
